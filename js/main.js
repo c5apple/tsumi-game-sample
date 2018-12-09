@@ -59,8 +59,8 @@
           // 画面外判定
           if (r.localY < -320) {
             // game.pushScene(gameOverScene);
-            if (10 < Number(labelCount.text)) {
-              label.text = 'おめでとう！';
+            if (10 <= Number(labelCount.text)) {
+              label.text = '10個以上！おめでとう！';
             } else {
               label.text = 'ゲームオーバー';
             }
@@ -101,9 +101,15 @@
         var baseFloor = new BaseFloor(i, 304 - (16 * 1));
       }
 
+      var walls = [];
+      var wallsRec = [];
+      var runningFlg = false;
+
       // タッチするとボックスを作成
       game.rootScene.on(Event.TOUCH_START, function (e) {
-        var wall = new Wall(e.x, e.y);
+        if (runningFlg === false) {
+          walls.push(new Wall(e.x, e.y));
+        }
       });
       // game.rootScene.on(Event.TOUCH_MOVE, function (e) {
       //   pig.x = e.x;
@@ -112,6 +118,33 @@
       game.rootScene.onenterframe = function () {
         // 物理エンジン処理
         world.step(game.fps);
+
+        // 現在の位置を記憶
+        if (wallsRec[game.frame] === undefined) {
+          wallsRec[game.frame] = walls.map(function(wall){
+            return {
+              x: wall.x,
+              y: wall.y
+            };
+          });
+        }
+        var wallsBefore = wallsRec[game.frame - 2];
+        if (walls.length > 0 && wallsBefore !== undefined && walls.length === wallsBefore.length) {
+          var flg = true;
+          for (var idx in walls) {
+            if (walls[idx].x !== wallsBefore[idx].x || walls[idx].y !== wallsBefore[idx].y) {
+              // 位置が変わったら
+              flg = false;
+            }
+          }
+          if (flg === true) {
+            // 停止したら次のオブジェクトを配置する
+            runningFlg = false;
+          } else {
+            runningFlg = true;
+          }
+        }
+
       }
       var gameOverScene = new Scene();
       // gameOverScene.backgroundColor = 'black';
