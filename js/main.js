@@ -45,7 +45,7 @@
     // ブロックの生成クラス
     var Wall = Class.create(PhyBoxSprite, {
       initialize: function (x, y) {
-        PhyBoxSprite.call(this, 32, 32, enchant.box2d.DYNAMIC_SPRITE, 10.0, 5.0, 0.0, true);
+        PhyBoxSprite.call(this, 32, 32, enchant.box2d.DYNAMIC_SPRITE, 5.0, 30.0, 0.0, true);
         this.image = game.assets.map1;
         this.frame = 2;
         this.x = x;
@@ -73,8 +73,18 @@
     // 床の生成クラス
     var Floor = Class.create(PhyBoxSprite, {
       initialize: function (x, y) {
-        PhyBoxSprite.call(this, 16, 16, enchant.box2d.STATIC_SPRITE, 0, 1.0, 0, false);
+        PhyBoxSprite.call(this, 16, 16, enchant.box2d.DYNAMIC_SPRITE, 1500.0, 50.0, 0.0, true);
         this.image = game.assets.map2;
+        this.x = x;
+        this.y = y;
+        game.rootScene.addChild(this);
+      }
+    });
+    // 透明な床の生成クラス
+    var BaseFloor = Class.create(PhyBoxSprite, {
+      initialize: function (x, y) {
+        PhyBoxSprite.call(this, 16, 16, enchant.box2d.STATIC_SPRITE, 0, 30.0, 0, false);
+        // this.image = game.assets.map2;
         this.x = x;
         this.y = y;
         game.rootScene.addChild(this);
@@ -86,8 +96,9 @@
       var world = new PhysicsWorld(0, 3);
 
       // 床の作成
-      for (var i = (16 * 1); i < 320 - (16 * 1); i += 16) {
+      for (var i = (16 * 2); i < 320 - (16 * 2); i += 16) {
         var floor = new Floor(i, 304 - (16 * 2));
+        var baseFloor = new BaseFloor(i, 304 - (16 * 1));
       }
 
       // タッチするとボックスを作成
